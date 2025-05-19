@@ -1,15 +1,26 @@
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn, Unique } from 'typeorm';
+import { Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn, Unique, UpdateDateColumn } from 'typeorm';
 import { UserEntity } from './User';
 import { IsNotEmpty, IsString } from 'class-validator';
 import { FullColumnDTO } from './Column';
+import { ApiProperty } from '@nestjs/swagger';
 
 @Entity()
 export class WorkspaceEntity {
     @PrimaryGeneratedColumn('uuid')
+    @ApiProperty({ description: 'Workspace id' })
     id: string;
 
     @Column()
+    @ApiProperty({ description: 'Workspace name' })
     name: string;
+
+    @CreateDateColumn()
+    @ApiProperty({ description: 'Workspace creation date' })
+    created_at: Date;
+
+    @UpdateDateColumn()
+    @ApiProperty({ description: 'Workspace update date' })
+    updated_at: Date;
 }
 
 @Entity()
@@ -29,11 +40,14 @@ export class WorkspaceUserEntity {
 
 export class FullWorkspaceDTO {
     @IsString()
+    @ApiProperty({ description: 'Workspace id' })
     id: string;
 
     @IsString()
+    @ApiProperty({ description: 'Workspace name' })
     name: string;
 
     @IsNotEmpty()
+    @ApiProperty({ description: 'Workspace columns', type: [FullColumnDTO] })
     columns: FullColumnDTO[]
 }

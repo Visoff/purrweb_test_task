@@ -49,8 +49,10 @@ export function WorkSpaceSelection() {
     if (localStorage.getItem('workspace')) {
         return <WorkSpacePage /> 
     }
-    return <ul>
-        {WorkSpaces.map(workspace => <li key={workspace.id}><button onClick={() => selectWorkspace(workspace.id)}>{workspace.name}</button></li>)}
-        <li><button onClick={createWorkspace}>+</button></li>
-    </ul>
+    return <div className="w-full h-screen flex justify-center items-center">
+        <ul className="flex flex-col p-4 gap-2 bg-gray-100 rounded-xl shadow-md items-center">
+            {WorkSpaces.map(workspace => <li className="w-1/3 min-w-fit bg-blue-200 h-fit p-2 px-4 rounded-xl cursor-pointer flex items-center justify-center hover:px-8 transition-all" key={workspace.id} onClick={() => selectWorkspace(workspace.id)}>{workspace.name}</li>)}
+            <li className="w-1/3 min-w-fit bg-blue-200 h-fit p-2 px-4 rounded-xl cursor-pointer flex items-center justify-center hover:px-8 transition-all" onClick={createWorkspace}>+</li>
+        </ul>
+    </div>
 }

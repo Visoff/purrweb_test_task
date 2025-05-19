@@ -1,5 +1,5 @@
 import { fetcher } from "@/lib/fetch"
-import { useRef, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 
 type card = {
     id: string
@@ -91,13 +91,83 @@ export function Card({card, ...props}: React.ComponentProps<"div"> & {card: card
         ).then(() => location.reload())
     }
 
+    const comments_dialog = useRef<HTMLDivElement>(null)
+
+    function EnableComments() {
+        comments_dialog.current!.style.display = "block"
+    }
+
+    function closeComment(e: React.MouseEvent<HTMLDivElement>) {
+        if (e.target !== comments_dialog.current) return
+        comments_dialog.current!.style.display = "none"
+    }
+
+    type comment = {
+        id: string
+        content: string
+        author_id: string,
+        card_id: string
+    }
+
+    const [Commnets, setComments] = useState<comment[]>([])
+
+    function updateComments() {
+        fetcher(
+            `/card/${card.id}/comments`,
+            {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${localStorage.getItem('token')}`,
+                },
+            },
+        )
+        .then(res => res.json())
+        .then((e) => {setComments(e)})
+    }
+
+    useEffect(() => {
+        updateComments()
+    }, [])
+
+    function sendComment(e: React.FormEvent) {
+        e.preventDefault()
+        fetcher(
+            `/card/${card.id}/comment`,
+            {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${localStorage.getItem('token')}`,
+                },
+                body: JSON.stringify({ content: ((e.currentTarget as HTMLFormElement)[0] as HTMLInputElement).value }),
+            },
+        )
+        .then(res => res.json())
+        .then(() => updateComments())
+        .then(() => ((e.currentTarget as HTMLFormElement)[0] as HTMLInputElement).value = "")
+    }
+
     return <div {...props}>
-        <span ref={cardref} onMouseDown={clickStart} onMouseMove={clickMove} onMouseUp={clickEnd} className="text-lg bg-blue-200 rounded-xl px-1 m-2 cursor-pointer" onContextMenu={ctx}>{card.name}</span>
+        <span ref={cardref} onMouseDown={clickStart} onMouseMove={clickMove} onMouseUp={clickEnd} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded cursor-pointer" onContextMenu={ctx}>{card.name}</span>
 
         <div ref={cmd} className="absolute rounded-md border border-slate-400 bg-white p-0.5" style={{display: "none"}}>
             <div className="flex flex-col gap-2">
                 <button className="bg-red-200 cursor-pointer" onClick={Delete}>Delete</button>
                 <button className="bg-green-200 cursor-pointer" onClick={Rename}>Rename</button>
+                <button className="bg-green-200 cursor-pointer" onClick={EnableComments}>Comments</button>
+            </div>
+        </div>
+
+        <div ref={comments_dialog} onClick={closeComment} className="absolute top-0 left-0 bg-black opacity-20 w-screen h-screen" style={{display: "none"}}>
+            <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 rounded-md border border-slate-400 bg-white p-0.5 text-black text-2xl">
+                {card.name}
+                <ul>
+                    {Commnets.map(comment => <li key={comment.id}>{comment.content}</li>)}
+                </ul>
+                <form onSubmit={sendComment}>
+                    <input type="text" name="comment" />
+                </form>
             </div>
         </div>
     </div>

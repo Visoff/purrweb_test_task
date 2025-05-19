@@ -65,16 +65,17 @@ export function WorkSpacePage() {
         .then(() => location.reload())
     }
 
-    return <>
-        <h1 className="text-4xl flex gap-5">
+    return <div className="w-full h-screen flex flex-col gap-5 justify-center items-center">
+        <h1 className="flex w-full text-4xl gap-5 justify-between">
             <button onClick={() => {localStorage.removeItem('workspace'); location.reload()}}>&larr;</button>
             <button onClick={() => {renameWorkspace()}}>{WorkSpace?.name}</button>
+            <div></div>
         </h1>
-        <div className="flex gap-2 flex-row">
+        <div className="flex-1 flex gap-2 flex-row">
             {WorkSpace?.columns.map(column => (
                 <Column key={column.id} column={column} />
             ))}
-            <button onClick={addColumn}>+</button>
+            <button className="h-max min-w-fit flex flex-col justify-left bg-gray-200 p-2 shadow-md rounded-xl m-4" onClick={addColumn}>+</button>
         </div>
-    </>
+    </div>
 }

@@ -18,6 +18,7 @@ import { AuthGuard } from "src/auth/auth.guard";
 import { FullWorkspaceDTO, WorkspaceEntity } from "../entities/Workspace";
 import { FullColumnDTO } from "src/entities/Column";
 import { ColumnService } from "src/column/column.service";
+import { ApiBody, ApiHeader, ApiOperation, ApiParam, ApiResponse } from "@nestjs/swagger";
 
 @Controller("workspace")
 export class WorkspaceController {
@@ -28,6 +29,12 @@ export class WorkspaceController {
     ) {}
 
     @Get(":id")
+    @ApiOperation({ summary: "Get workspace by id" })
+    @ApiHeader({ name: "Authorization", required: true })
+    @ApiParam({ name: "id", required: true })
+    @ApiResponse({ status: 200, type: FullWorkspaceDTO })
+    @ApiResponse({ status: 401, description: "Unauthorized" })
+    @ApiResponse({ status: 404, description: "Workspace not found" })
     @UseGuards(AuthGuard)
     async get(
         @Headers("Authorization") bearer: string,
@@ -48,6 +55,13 @@ export class WorkspaceController {
     }
 
     @Patch(":id/name")
+    @ApiOperation({ summary: "Update workspace name" })
+    @ApiHeader({ name: "Authorization", required: true })
+    @ApiParam({ name: "id", required: true })
+    @ApiResponse({ status: 200, type: FullWorkspaceDTO })
+    @ApiResponse({ status: 401, description: "Unauthorized" })
+    @ApiResponse({ status: 404, description: "Workspace not found" })
+    @ApiResponse({ status: 400, description: "Name is required" })
     @UseGuards(AuthGuard)
     async update_name(
         @Headers("Authorization") bearer: string,
@@ -73,6 +87,12 @@ export class WorkspaceController {
     }
 
     @Delete(":id")
+    @ApiOperation({ summary: "Delete workspace" })
+    @ApiHeader({ name: "Authorization", required: true })
+    @ApiParam({ name: "id", required: true })
+    @ApiResponse({ status: 200, description: "OK" })
+    @ApiResponse({ status: 401, description: "Unauthorized" })
+    @ApiResponse({ status: 404, description: "Workspace not found" })
     @UseGuards(AuthGuard)
     async delete(
         @Headers("Authorization") bearer: string,
@@ -94,6 +114,13 @@ export class WorkspaceController {
     }
 
     @Post(":id/column")
+    @ApiOperation({ summary: "Add column to workspace" })
+    @ApiHeader({ name: "Authorization", required: true })
+    @ApiParam({ name: "id", required: true })
+    @ApiResponse({ status: 200, type: FullColumnDTO })
+    @ApiResponse({ status: 401, description: "Unauthorized" })
+    @ApiResponse({ status: 404, description: "Workspace not found" })
+    @ApiResponse({ status: 400, description: "Name is required" })
     @UseGuards(AuthGuard)
     async add_column(
         @Headers("Authorization") bearer: string,
@@ -119,6 +146,10 @@ export class WorkspaceController {
     }
 
     @Get()
+    @ApiOperation({ summary: "List workspaces" })
+    @ApiHeader({ name: "Authorization", required: true })
+    @ApiResponse({ status: 200, type: [WorkspaceEntity] })
+    @ApiResponse({ status: 401, description: "Unauthorized" })
     @UseGuards(AuthGuard)
     async list(
         @Headers("Authorization") bearer: string,
@@ -132,6 +163,11 @@ export class WorkspaceController {
 
     @Post()
     @UseGuards(AuthGuard)
+    @ApiOperation({ summary: "Create workspace" })
+    @ApiHeader({ name: "Authorization", required: true })
+    @ApiResponse({ status: 200, type: WorkspaceEntity })
+    @ApiResponse({ status: 401, description: "Unauthorized" })
+    @ApiResponse({ status: 400, description: "Name is required" })
     async create(
         @Body() body: { name: string },
         @Headers("Authorization") bearer: string,
