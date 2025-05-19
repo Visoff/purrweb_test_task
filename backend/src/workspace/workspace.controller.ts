@@ -14,7 +14,7 @@ import {
 } from "@nestjs/common";
 import { UserService } from "src/user/user.service";
 import { WorkspaceService } from "./workspace.service";
-import { AuthGuard } from "src/auth/auth.guard";
+import { AuthGuard, AuthGuardWorkspace} from "src/auth/auth.guard";
 import { FullWorkspaceDTO, WorkspaceEntity } from "../entities/Workspace";
 import { FullColumnDTO } from "src/entities/Column";
 import { ColumnService } from "src/column/column.service";
@@ -36,6 +36,7 @@ export class WorkspaceController {
     @ApiResponse({ status: 401, description: "Unauthorized" })
     @ApiResponse({ status: 404, description: "Workspace not found" })
     @UseGuards(AuthGuard)
+    @UseGuards(AuthGuardWorkspace)
     async get(
         @Headers("Authorization") bearer: string,
         @Param("id", new ParseUUIDPipe()) id: string,
@@ -63,6 +64,7 @@ export class WorkspaceController {
     @ApiResponse({ status: 404, description: "Workspace not found" })
     @ApiResponse({ status: 400, description: "Name is required" })
     @UseGuards(AuthGuard)
+    @UseGuards(AuthGuardWorkspace)
     async update_name(
         @Headers("Authorization") bearer: string,
         @Body("name") name: string,
@@ -94,6 +96,7 @@ export class WorkspaceController {
     @ApiResponse({ status: 401, description: "Unauthorized" })
     @ApiResponse({ status: 404, description: "Workspace not found" })
     @UseGuards(AuthGuard)
+    @UseGuards(AuthGuardWorkspace)
     async delete(
         @Headers("Authorization") bearer: string,
         @Param("id", new ParseUUIDPipe()) id: string,
@@ -122,6 +125,7 @@ export class WorkspaceController {
     @ApiResponse({ status: 404, description: "Workspace not found" })
     @ApiResponse({ status: 400, description: "Name is required" })
     @UseGuards(AuthGuard)
+    @UseGuards(AuthGuardWorkspace)
     async add_column(
         @Headers("Authorization") bearer: string,
         @Body("name") name: string,

@@ -2,7 +2,7 @@ import { Body, Controller, Delete, Get, HttpException, HttpStatus, Param, Header
 import { FullCardDTO } from 'src/entities/Card';
 import { CardService } from './card.service';
 import { ColumnService } from 'src/column/column.service';
-import { AuthGuard } from 'src/auth/auth.guard';
+import { AuthGuard, AuthGuardCard } from 'src/auth/auth.guard';
 import { CommentEntity } from 'src/entities/Comment';
 import { UserService } from 'src/user/user.service';
 import { ApiOperation, ApiParam, ApiResponse } from '@nestjs/swagger';
@@ -17,6 +17,7 @@ export class CardController {
 
     @Get(":id")
     @UseGuards(AuthGuard)
+    @UseGuards(AuthGuardCard)
     @ApiOperation({ summary: "Get card by id" })
     @ApiParam({ name: "id", type: "string" })
     @ApiResponse({ status: 200, type: FullCardDTO })
@@ -31,6 +32,7 @@ export class CardController {
 
     @Patch(":id/name")
     @UseGuards(AuthGuard)
+    @UseGuards(AuthGuardCard)
     @ApiOperation({ summary: "Update card name" })
     @ApiParam({ name: "id", type: "string" })
     @ApiResponse({ status: 200, type: FullCardDTO })
@@ -48,6 +50,7 @@ export class CardController {
 
     @Patch(":id/move")
     @UseGuards(AuthGuard)
+    @UseGuards(AuthGuardCard)
     @ApiOperation({ summary: "Move card to another column" })
     @ApiParam({ name: "id", type: "string" })
     @ApiResponse({ status: 200, type: FullCardDTO })
@@ -69,6 +72,7 @@ export class CardController {
 
     @Delete(":id")
     @UseGuards(AuthGuard)
+    @UseGuards(AuthGuardCard)
     @ApiOperation({ summary: "Delete card" })
     @ApiParam({ name: "id", type: "string" })
     @ApiResponse({ status: 200, type: FullCardDTO })
@@ -83,6 +87,13 @@ export class CardController {
     }
 
     @Get(":id/comments")
+    @UseGuards(AuthGuard)
+    @UseGuards(AuthGuardCard)
+    @ApiOperation({ summary: "Get comments by card id" })
+    @ApiParam({ name: "id", type: "string" })
+    @ApiResponse({ status: 200, type: [CommentEntity] })
+    @ApiResponse({ status: 404, description: "Card not found" })
+    @ApiResponse({ status: 401, description: "Unauthorized" })
     async get_comments(@Param('id', new ParseUUIDPipe()) id: string): Promise<CommentEntity[]> {
         const card = await this.cardService.get(id);
         if (!card) {
@@ -93,6 +104,13 @@ export class CardController {
 
     @Post(":id/comment")
     @UseGuards(AuthGuard)
+    @UseGuards(AuthGuardCard)
+    @ApiOperation({ summary: "Add comment to card" })
+    @ApiParam({ name: "id", type: "string" })
+    @ApiResponse({ status: 200, type: CommentEntity })
+    @ApiResponse({ status: 404, description: "Card not found" })
+    @ApiResponse({ status: 401, description: "Unauthorized" })
+    @ApiResponse({ status: 400, description: "Content is required" })
     async add_comment(@Param('id', new ParseUUIDPipe()) id: string, @Headers("Authorization") token: string, @Body("content") content: string): Promise<any> {
         const user = await this.userService.from_bearer(token);
         if (!user) {

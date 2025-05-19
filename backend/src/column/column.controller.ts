@@ -1,8 +1,9 @@
-import { Body, Controller, Delete, Get, HttpException, HttpStatus, Param, ParseUUIDPipe, Patch, Post } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpException, HttpStatus, Param, ParseUUIDPipe, Patch, Post, UseGuards } from '@nestjs/common';
 import { ColumnService } from './column.service';
 import { FullCardDTO } from 'src/entities/Card';
 import { CardService } from 'src/card/card.service';
 import { ApiOperation, ApiParam, ApiResponse } from '@nestjs/swagger';
+import { AuthGuard, AuthGuardColumn } from 'src/auth/auth.guard';
 
 @Controller('column')
 export class ColumnController {
@@ -17,6 +18,8 @@ export class ColumnController {
     @ApiResponse({ status: 200, type: FullCardDTO })
     @ApiResponse({ status: 404, description: 'Column not found' })
     @ApiResponse({ status: 500, description: 'Internal server error' })
+    @UseGuards(AuthGuard)
+    @UseGuards(AuthGuardColumn)
     async get(@Param('id', new ParseUUIDPipe()) id: string): Promise<FullCardDTO> {
         const column = await this.columnService.get(id);
         if (!column) {
@@ -31,6 +34,8 @@ export class ColumnController {
     @ApiResponse({ status: 200, type: FullCardDTO })
     @ApiResponse({ status: 404, description: 'Column not found' })
     @ApiResponse({ status: 500, description: 'Internal server error' })
+    @UseGuards(AuthGuard)
+    @UseGuards(AuthGuardColumn)
     async add_card(@Param('id', new ParseUUIDPipe()) id: string, @Body("name") name: string): Promise<FullCardDTO> {
         const column = await this.columnService.get(id);
         if (!column) {
@@ -45,6 +50,8 @@ export class ColumnController {
     @ApiParam({ name: 'id', type: String })
     @ApiResponse({ status: 200, type: FullCardDTO })
     @ApiResponse({ status: 404, description: 'Column not found' })
+    @UseGuards(AuthGuard)
+    @UseGuards(AuthGuardColumn)
     async update_name(@Param('id', new ParseUUIDPipe()) id: string, @Body("name") name: string): Promise<FullCardDTO> {
         const column = await this.columnService.get(id);
         if (!column) {
@@ -60,6 +67,8 @@ export class ColumnController {
     @ApiResponse({ status: 200, type: FullCardDTO })
     @ApiResponse({ status: 404, description: 'Column not found' })
     @ApiResponse({ status: 500, description: 'Internal server error' })
+    @UseGuards(AuthGuard)
+    @UseGuards(AuthGuardColumn)
     async delete(@Param('id', new ParseUUIDPipe()) id: string): Promise<void> {
         const column = await this.columnService.get(id);
         if (!column) {

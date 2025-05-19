@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { ColumnService } from 'src/column/column.service';
 import { CardEntity, FullCardDTO } from 'src/entities/Card';
 import { ColumnEntity } from 'src/entities/Column';
 import { CommentEntity } from 'src/entities/Comment';
@@ -12,7 +13,9 @@ export class CardService {
         @InjectRepository(CardEntity)
         private readonly cardRepository: Repository<CardEntity>,
         @InjectRepository(CommentEntity)
-        private readonly commentRepository: Repository<CommentEntity>
+        private readonly commentRepository: Repository<CommentEntity>,
+
+        private readonly columnService: ColumnService
     ) {}
 
     async get(id: string): Promise<CardEntity | null> {
@@ -47,5 +50,13 @@ export class CardService {
 
     async get_comments(card: CardEntity): Promise<CommentEntity[]> {
         return await this.commentRepository.find({ where: { card_id: card.id } })
+    }
+
+    async has_user(card: CardEntity, user: any): Promise<boolean> {
+        const column = await this.columnService.get(card.column_id);
+        if (!column) {
+            return false;
+        }
+        return this.columnService.has_user(column, user);
     }
 }

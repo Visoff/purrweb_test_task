@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { CardService } from 'src/card/card.service';
 import { CardEntity, FullCardDTO } from 'src/entities/Card';
 import { ColumnEntity, FullColumnDTO } from 'src/entities/Column';
+import { WorkspaceService } from 'src/workspace/workspace.service';
 import { Repository } from 'typeorm';
 
 @Injectable()
@@ -14,6 +15,7 @@ export class ColumnService {
         private readonly CardRepository: Repository<CardEntity>,
 
         private readonly cardService: CardService
+        private readonly workspaceService: WorkspaceService
     ) {}
 
     async get(id: string): Promise<ColumnEntity | null> {
@@ -46,5 +48,13 @@ export class ColumnService {
             name: column.name,
             cards: cards
         }
+    }
+
+    async has_user(column: ColumnEntity, user: any): Promise<boolean> {
+        const workspace = await this.workspaceService.get(column.workspace_id);
+        if (!workspace) {
+            return false;
+        }
+        return this.workspaceService.has_user(workspace, user);
     }
 }
